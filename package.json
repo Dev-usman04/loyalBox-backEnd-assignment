@@ -1,0 +1,29 @@
+{
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "date": "^2.0.6",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-async-handler": "^1.2.0",
+    "fns": "^1.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.0",
+    "uuid": "^11.1.0"
+  },
+  "name": "loyahbox",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node Server",
+    "dev": "nodemon Server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
