@@ -1,27 +1,27 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const mongoose = require('mongoose');
-
-// ✅ Load environment variables first
-dotenv.config();
-
-// ✅ Now import connectDB
 const connectDB = require('./config/db');
-connectDB(); 
-
+const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const rewardRoutes = require('./routes/rewardRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
 
+dotenv.config();
 const app = express();
+
 app.use(express.json());
 
-// Routes
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/users', userRoutes);
-app.use('/api/rewards', rewardRoutes);
+// Serve Swagger UI
+const swaggerDocument = JSON.parse(fs.readFileSync('./swagger.json', 'utf8'));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Root route
-app.get('/', (req, res) => res.send('LoyalBox API'));
+// Connect to MongoDB
+connectDB();
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server 🏃 on port ${PORT}`));
+app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/admin', adminRoutes);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

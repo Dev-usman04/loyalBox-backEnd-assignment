@@ -1,72 +1,66 @@
-const asyncHandler = require('express-async-handler');
 const Reward = require('../models/Reward');
 const User = require('../models/User');
+const Transaction = require('../models/Transaction');
 
-
-const createReward = asyncHandler(async (req, res) => {
-  const { name, Points, description } = req.body;
-
-  if (!name || !Points) {
-    res.status(400);
-    throw new Error('Name and Points are required');
+exports.createReward = async (req, res) => {
+  try {
+    const { name, pointsRequired, description } = req.body;
+    const reward = new Reward({ name, pointsRequired, description });
+    await reward.save();
+    res.status(201).json({ message: 'Reward created', reward });
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating reward', error });
   }
+};
 
-  const reward = await Reward.create({ name, Points, description });
-  res.status(201).json(reward);
-});
-
-
-
-const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await User.find().select('-password'); 
-
-  res.json(users);
-});
-
-const promoteUserToAdmin = asyncHandler(async (req, res) => {
-  const userId = req.params.id;
-
-  const user = await User.findById(userId);
-
-  if (!user) {
-    res.status(404);
-    throw new Error('User not found');
+exports.updateReward = async (req, res) => {
+  try {
+    const { rewardId } = req.params;
+    const reward = await Reward.findByIdAndUpdate(rewardId, req.body, { new: true });
+    if (!reward) return res.status(404).json({ message: 'Reward not found' });
+    res.json({ message: 'Reward updated', reward });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating reward', error });
   }
+};
 
-  if (user.isAdmin) {
-    res.status(400);
-    throw new Error('User is already an admin');
+exports.deleteReward = async (req, res) => {
+  try {
+    const { rewardId } = req.params;
+    const reward = await Reward.findByIdAndDelete(rewardId);
+    if (!reward) return res.status(404).json({ message: 'Reward not found' });
+    res.json({ message: 'Reward deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error deleting reward', error });
   }
+};
 
-  user.isAdmin = true;
-  await user.save();
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching users', error });
+  }
+};
 
-  res.json({ message: `User ${user.name} is now an admin.` });
-});
+exports.getUserHistory = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const transactions = await Transaction.find({ user: userId }).sort({ date: -1 });
+    res.json(transactions);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user history', error });
+  }
+};
 
-
-
-const getAllTransactions = asyncHandler(async (req, res) => {
-  const users = await User.find().select('name email transactions').lean(); // <-- .lean() is key
-
-  const allTransactions = users.flatMap(user =>
-    user.transactions.map(item => ({
-      userName: user.name,
-      email: user.email,
-      type: item.type,
-      amount: item.amount,
-      description: item.description,
-      date: item.date
-    }))
-  );
-
-  res.json(allTransactions);
-});
-
-
-
-
-module.exports = { createReward,
-                  getAllUsers,
-                  promoteUserToAdmin,
-                  getAllTransactions};
+exports.promoteToAdmin = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const user = await User.findByIdAndUpdate(userId, { role: 'admin' }, { new: true });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ message: 'User promoted to admin', user });
+  } catch (error) {
+    res.status(500).json({ message: 'Error promoting user', error });
+  }
+};
