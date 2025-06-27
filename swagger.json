@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "https://loyalbox-backend-assignment.onrender.com/api",
+      "url": "https://loyalbox-backend-assignment.onrender.com",
       "description": "Local development server"
     }
   ],
