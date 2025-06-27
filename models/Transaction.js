@@ -5,7 +5,7 @@ const transactionSchema = new mongoose.Schema({
   type: { type: String, enum: ['purchase', 'redeem'], required: true },
   points: { type: Number, required: true },
   description: { type: String },
-  date: { type: Date, default: Date.now },
+  date: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Transaction', transactionSchema);

@@ -26,7 +26,7 @@ const purchaseItem = async (req, res) => {
     });
     await transaction.save();
 
-    res.json({ message: 'Purchase successful', points: user.points });
+    res.json({ message: `You have successfully purchased  ${itemName}, and earned ${user.points} points` });
   } catch (error) {
     res.status(500).json({ message: 'Error processing purchase', error });
   }
